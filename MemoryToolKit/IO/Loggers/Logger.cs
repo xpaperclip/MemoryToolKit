@@ -4,13 +4,27 @@ namespace MemoryToolKit.IO;
 
 public abstract class Logger
 {
-	private readonly Dictionary<string, Stopwatch> Stopwatches = new();
-	private readonly Dictionary<string, List<double>> Averages = new();
+	protected readonly Dictionary<string, Stopwatch> Stopwatches = new();
+	protected readonly Dictionary<string, List<double>> Averages = new();
 
 	public abstract void Log();
 	public abstract void Log(object output);
 	public abstract void Start();
 	public abstract void Stop();
+
+	public void Benchmark(string id, Action action)
+	{
+		StartBenchmark(id);
+		action?.Invoke();
+		StopBenchmark(id);
+	}
+
+	public void AvgBenchmark(string id, Action action)
+	{
+		StartAvgBenchmark(id);
+		action?.Invoke();
+		StopAvgBenchmark(id);
+	}
 
 	public void StartBenchmark(string id)
 	{
