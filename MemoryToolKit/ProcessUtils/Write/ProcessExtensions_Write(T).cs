@@ -1,4 +1,5 @@
-﻿using MemoryToolKit.MemoryUtils;
+﻿using MemoryToolKit.Helpers;
+using MemoryToolKit.MemoryUtils;
 using System.Diagnostics;
 using SIZE_T = System.UIntPtr;
 

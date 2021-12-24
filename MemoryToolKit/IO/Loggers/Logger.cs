@@ -4,8 +4,8 @@ namespace MemoryToolKit.IO;
 
 public abstract class Logger
 {
-	protected readonly Dictionary<string, Stopwatch> Stopwatches = new();
-	protected readonly Dictionary<string, List<double>> Averages = new();
+	protected readonly Dictionary<string, Stopwatch> _stopwatches = new();
+	protected readonly Dictionary<string, List<double>> _averages = new();
 
 	public abstract void Log();
 	public abstract void Log(object output);
@@ -28,28 +28,28 @@ public abstract class Logger
 
 	public void StartBenchmark(string id)
 	{
-		Stopwatches[id] = Stopwatch.StartNew();
+		_stopwatches[id] = Stopwatch.StartNew();
 	}
 
 	public void StopBenchmark(string id, string prefix = "")
 	{
-		Stopwatches[id].Stop();
-		Log($"{prefix}Benchmark for [{id}]: {Stopwatches[id].Elapsed}");
+		_stopwatches[id].Stop();
+		Log($"{prefix}Benchmark for [{id}]: {_stopwatches[id].Elapsed}");
 	}
 
 	public void StartAvgBenchmark(string id)
 	{
-		Stopwatches[id] = Stopwatch.StartNew();
+		_stopwatches[id] = Stopwatch.StartNew();
 
-		if (!Averages.ContainsKey(id))
-			Averages[id] = new();
+		if (!_averages.ContainsKey(id))
+			_averages[id] = new();
 	}
 
 	public void StopAvgBenchmark(string id, string prefix = "")
 	{
-		Stopwatches[id].Stop();
+		_stopwatches[id].Stop();
 
-		Averages[id].Add(Stopwatches[id].Elapsed.TotalSeconds);
-		Log($"{prefix}Benchmark for [{id}]: {Stopwatches[id].Elapsed} | Average: {Averages[id].Sum() / Averages[id].Count:0.0000000}");
+		_averages[id].Add(_stopwatches[id].Elapsed.TotalSeconds);
+		Log($"{prefix}Benchmark for [{id}]: {_stopwatches[id].Elapsed} | Average: {_averages[id].Sum() / _averages[id].Count:0.0000000}");
 	}
 }

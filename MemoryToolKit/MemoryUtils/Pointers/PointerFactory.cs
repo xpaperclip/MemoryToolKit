@@ -10,9 +10,9 @@ public partial class Pointer
 		#region Constructors
 		public Factory(Process process, DerefType derefType, ProcessUtils.ProcessModule module)
 		{
-			Process = process;
-			DerefType = derefType;
-			DefaultModuleBase = module.BaseAddress;
+			_process = process;
+			_derefType = derefType;
+			_defaultModuleBase = module.BaseAddress;
 		}
 
 		public Factory(Process process, ProcessUtils.ProcessModule module)
@@ -32,9 +32,9 @@ public partial class Pointer
 		#endregion
 
 		#region Fields
-		internal Process Process;
-		internal DerefType DerefType;
-		internal IntPtr DefaultModuleBase;
+		internal Process _process;
+		internal DerefType _derefType;
+		internal IntPtr _defaultModuleBase;
 		#endregion
 	}
 }

@@ -1,4 +1,4 @@
-﻿namespace MemoryToolKit;
+﻿namespace MemoryToolKit.Helpers;
 
 /// <summary>
 ///     Provides several useful extension methods for the user's convenience.
@@ -18,10 +18,10 @@ public static class ExtensionMethods
 	public static unsafe T To<T>(this byte[] bytes) where T : unmanaged
 	{
 		if (bytes is null)
-			return default(T);
+			return default;
 
 		fixed (byte* bytesPtr = bytes)
-			return *(T*)(bytesPtr);
+			return *(T*)bytesPtr;
 	}
 
 	/// <summary>
@@ -37,7 +37,7 @@ public static class ExtensionMethods
 	public static unsafe T To<T>(this byte[] bytes, int offset = 0x0) where T : unmanaged
 	{
 		if (bytes is null)
-			return default(T);
+			return default;
 
 		fixed (byte* bytesPtr = bytes)
 			return *(T*)(bytesPtr + offset);
@@ -52,7 +52,7 @@ public static class ExtensionMethods
 	{
 		var size = sizeof(T);
 		var bytes = new byte[size];
-		return value.ToBytes<T>(bytes, size);
+		return value.ToBytes(bytes, size);
 	}
 
 	/// <summary>
@@ -68,7 +68,7 @@ public static class ExtensionMethods
 	public static unsafe byte[] ToBytes<T>(this T value, byte[] bytes) where T : unmanaged
 	{
 		var size = sizeof(T);
-		return value.ToBytes<T>(bytes, size);
+		return value.ToBytes(bytes, size);
 	}
 
 	/// <summary>
@@ -80,7 +80,7 @@ public static class ExtensionMethods
 	public static byte[] ToBytes<T>(this T value, int size) where T : unmanaged
 	{
 		var bytes = new byte[size];
-		return value.ToBytes<T>(bytes, size);
+		return value.ToBytes(bytes, size);
 	}
 
 	/// <summary>

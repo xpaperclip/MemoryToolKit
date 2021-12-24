@@ -6,16 +6,16 @@ namespace MemoryToolKit.MemoryUtils.Pointers;
 public abstract partial class Pointer
 {
 	#region Constructors
-	public Pointer(Process process, DerefType derefType, IntPtr baseAddress, params int[] offsets)
+	internal Pointer(Process process, DerefType derefType, IntPtr baseAddress, params int[] offsets)
 	{
-		Process = process;
+		_process = process;
 		DerefType = derefType;
 		Offsets = offsets;
 		Base = baseAddress;
 	}
 
-	public Pointer(DerefType derefType, Pointer parent, params int[] offsets)
-		: this(parent.Process, derefType, parent.Base, parent.Offsets.Concat(offsets).ToArray())
+	internal Pointer(DerefType derefType, Pointer parent, params int[] offsets)
+		: this(parent._process, derefType, parent.Base, parent.Offsets.Concat(offsets).ToArray())
 	{
 		Name = parent.Name;
 	}
@@ -27,10 +27,10 @@ public abstract partial class Pointer
 	/// </summary>
 	public DerefType DerefType;
 
-	protected readonly Process Process;
-	protected DateTime? LastUpdate;
-	protected object _current;
-	protected object _old;
+	internal readonly Process _process;
+	internal DateTime? _lastUpdate;
+	internal object _current;
+	internal object _old;
 	#endregion
 
 	#region Properties
@@ -107,9 +107,9 @@ public abstract partial class Pointer
 
 		var dtNow = DateTime.Now;
 
-		if (LastUpdate is null || (dtNow - LastUpdate.Value).TotalMilliseconds > UpdateInterval.Value)
+		if (_lastUpdate is null || (dtNow - _lastUpdate.Value).TotalMilliseconds > UpdateInterval.Value)
 		{
-			LastUpdate = dtNow;
+			_lastUpdate = dtNow;
 			return Internal_Update();
 		}
 
@@ -118,7 +118,7 @@ public abstract partial class Pointer
 
 	public IntPtr Deref()
 	{
-		if (Process.TryDeref(DerefType, out var derefAddress, Base, Offsets))
+		if (_process.TryDeref(DerefType, out var derefAddress, Base, Offsets))
 			return derefAddress;
 
 		return IntPtr.Zero;

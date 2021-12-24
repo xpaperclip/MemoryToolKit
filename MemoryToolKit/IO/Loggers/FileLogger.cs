@@ -6,67 +6,67 @@ public class FileLogger : Logger
 {
 	public FileLogger(string filePath)
 	{
-		FilePath = filePath;
+		_filePath = filePath;
 	}
 
-	private int LineNumber;
-	private readonly string FilePath;
-	private readonly Queue<string> QueuedLines = new();
-	private readonly CancellationTokenSource CancelSource = new();
-	private readonly ManualResetEvent ResetEvent = new(false);
+	private int _lineNumber;
+	private readonly string _filePath;
+	private readonly Queue<string> _queuedLines = new();
+	private readonly CancellationTokenSource _cancelSource = new();
+	private readonly ManualResetEvent _resetEvent = new(false);
 
 	public int MaximumLinesInFile { get; set; } = 4096;
 	public int LinesAfterFlush { get; set; } = 512;
 
 	public override void Log()
 	{
-		lock (QueuedLines)
+		lock (_queuedLines)
 		{
-			QueuedLines.Enqueue("");
-			ResetEvent.Set();
+			_queuedLines.Enqueue("");
+			_resetEvent.Set();
 		}
 	}
 
 	public override void Log(object output)
 	{
-		lock (QueuedLines)
+		lock (_queuedLines)
 		{
-			QueuedLines.Enqueue($"{DateTime.Now:HH:mm:ss:fff} | {output}");
-			ResetEvent.Set();
+			_queuedLines.Enqueue($"{DateTime.Now:HH:mm:ss:fff} | {output}");
+			_resetEvent.Set();
 		}
 	}
 
 	public override void Start()
 	{
-		var token = CancelSource.Token;
+		var token = _cancelSource.Token;
 
 		Task.Run(() =>
 		{
-			if (!File.Exists(FilePath))
+			if (!File.Exists(_filePath))
 			{
-				File.Create(FilePath);
-				LineNumber = 0;
+				File.Create(_filePath);
+				_lineNumber = 0;
 			}
 			else
 			{
-				LineNumber = File.ReadAllLines(FilePath).Length;
+				_lineNumber = File.ReadAllLines(_filePath).Length;
 			}
 
 			string output = null;
 
 			while (true)
 			{
-				ResetEvent.WaitOne();
+				_resetEvent.WaitOne();
 
-				lock (QueuedLines)
+				lock (_queuedLines)
 				{
-					if (!QueuedLines.Any())
+					if (!_queuedLines.Any())
 					{
-						ResetEvent.Reset();
+						_resetEvent.Reset();
 						continue;
 					}
 
-					output = QueuedLines.Dequeue();
+					output = _queuedLines.Dequeue();
 				}
 
 				WriteLine(output);
@@ -77,23 +77,23 @@ public class FileLogger : Logger
 
 	public override void Stop()
 	{
-		CancelSource.Cancel();
-		ResetEvent.Set();
+		_cancelSource.Cancel();
+		_resetEvent.Set();
 	}
 
 	private void WriteLine(string output)
 	{
-		if (LineNumber >= MaximumLinesInFile)
+		if (_lineNumber >= MaximumLinesInFile)
 		{
-			string tempFile = $"{FilePath}-temp";
-			var lines = File.ReadAllLines(FilePath)[^LinesAfterFlush..];
+			string tempFile = $"{_filePath}-temp";
+			var lines = File.ReadAllLines(_filePath)[^LinesAfterFlush..];
 
 			File.WriteAllLines(tempFile, lines);
 
 			try
 			{
-				File.Copy(tempFile, FilePath, true);
-				LineNumber = lines.Length;
+				File.Copy(tempFile, _filePath, true);
+				_lineNumber = lines.Length;
 			}
 			catch
 			{
@@ -114,10 +114,10 @@ public class FileLogger : Logger
 
 		try
 		{
-			using StreamWriter streamWriter = new(FilePath, true);
+			using StreamWriter streamWriter = new(_filePath, true);
 
 			streamWriter.WriteLine(output);
-			++LineNumber;
+			++_lineNumber;
 		}
 		catch (Exception ex)
 		{

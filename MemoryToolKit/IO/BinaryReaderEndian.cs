@@ -88,7 +88,7 @@ public class BinaryReaderEndian : BinaryReader
 		var bytes = base.ReadBytes(count);
 		ulong result = bytes[^1];
 
-		for (int i = count - 2; i >= 0; --i)
+		for (var i = count - 2; i >= 0; --i)
 			result |= (uint)(bytes[i]) << (count - 1 - i) * 8;
 
 		return result;

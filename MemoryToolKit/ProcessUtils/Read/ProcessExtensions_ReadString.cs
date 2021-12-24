@@ -297,7 +297,7 @@ public static partial class ProcessExtensions
 
 			length *= (uint)(encoding.CharSize);
 
-			for (int j = 0; j < length; j += encoding.CharSize)
+			for (var j = 0; j < length; j += encoding.CharSize)
 			{
 				if (bytes[j] == 0)
 					return encoding.Type.GetString(byteList.ToArray());
@@ -652,7 +652,7 @@ public static partial class ProcessExtensions
 
 			length *= (uint)(encoding.CharSize);
 
-			for (int j = 0; j < length; j += encoding.CharSize)
+			for (var j = 0; j < length; j += encoding.CharSize)
 			{
 				if (bytes[j] == 0)
 					return encoding.Type.GetString(byteList.ToArray());

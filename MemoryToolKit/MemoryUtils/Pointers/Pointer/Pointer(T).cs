@@ -57,19 +57,19 @@ public class Pointer<T> : Pointer where T : unmanaged
 	#region Methods
 	public bool Write(T value)
 	{
-		return Process.Write<T>(value, DerefType, Base, Offsets);
+		return _process.Write<T>(value, DerefType, Base, Offsets);
 	}
 
 	public override void Reset()
 	{
 		base.Current = default(T);
 		base.Old = default(T);
-		LastUpdate = null;
+		_lastUpdate = null;
 	}
 
 	protected override bool Internal_Update()
 	{
-		if (Process.TryRead<T>(DerefType, out var result, Base, Offsets) || UpdateOnNullPointer)
+		if (_process.TryRead<T>(DerefType, out var result, Base, Offsets) || UpdateOnNullPointer)
 		{
 			_old = (T)(_current ?? default(T));
 			_current = result;

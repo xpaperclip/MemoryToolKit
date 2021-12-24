@@ -10,31 +10,31 @@ public partial class Pointer
 		#region DefaultModule
 		public Pointer<T> Make<T>(int baseOffset, params int[] offsets) where T : unmanaged
 		{
-			return Make<T>(DerefType, DefaultModuleBase + baseOffset, offsets);
+			return Make<T>(_derefType, _defaultModuleBase + baseOffset, offsets);
 		}
 
 		public Pointer<T> Make<T>(DerefType derefType, int baseOffset, params int[] offsets) where T : unmanaged
 		{
-			return Make<T>(derefType, DefaultModuleBase + baseOffset, offsets);
+			return Make<T>(derefType, _defaultModuleBase + baseOffset, offsets);
 		}
 		#endregion
 
 		#region ModuleName
 		public Pointer<T> Make<T>(string moduleName, int baseOffset, params int[] offsets) where T : unmanaged
 		{
-			return Make<T>(DerefType, Process.Module(moduleName).BaseAddress + baseOffset, offsets);
+			return Make<T>(_derefType, _process.Module(moduleName).BaseAddress + baseOffset, offsets);
 		}
 
 		public Pointer<T> Make<T>(DerefType derefType, string moduleName, int baseOffset, params int[] offsets) where T : unmanaged
 		{
-			return Make<T>(derefType, Process.Module(moduleName).BaseAddress + baseOffset, offsets);
+			return Make<T>(derefType, _process.Module(moduleName).BaseAddress + baseOffset, offsets);
 		}
 		#endregion
 
 		#region Module
 		public Pointer<T> Make<T>(ProcessModule module, int baseOffset, params int[] offsets) where T : unmanaged
 		{
-			return Make<T>(DerefType, module.BaseAddress + baseOffset, offsets);
+			return Make<T>(_derefType, module.BaseAddress + baseOffset, offsets);
 		}
 
 		public Pointer<T> Make<T>(DerefType derefType, ProcessModule module, int baseOffset, params int[] offsets) where T : unmanaged
@@ -46,12 +46,12 @@ public partial class Pointer
 		#region Address
 		public Pointer<T> Make<T>(IntPtr address, params int[] offsets) where T : unmanaged
 		{
-			return Make<T>(DerefType, address, offsets);
+			return Make<T>(_derefType, address, offsets);
 		}
 
 		public Pointer<T> Make<T>(DerefType derefType, IntPtr address, params int[] offsets) where T : unmanaged
 		{
-			var pointer = new Pointer<T>(Process, derefType, address, offsets);
+			var pointer = new Pointer<T>(_process, derefType, address, offsets);
 			_ = pointer.Current;
 
 			return pointer;
@@ -61,7 +61,7 @@ public partial class Pointer
 		#region Pointer
 		public Pointer<T> Make<T>(Pointer parent, params int[] offsets) where T : unmanaged
 		{
-			return Make<T>(DerefType, parent, offsets);
+			return Make<T>(_derefType, parent, offsets);
 		}
 
 		public Pointer<T> Make<T>(DerefType derefType, Pointer parent, params int[] offsets) where T : unmanaged
@@ -80,31 +80,31 @@ public partial class Pointer
 		#region DefaultModule
 		public StringPointer MakeString(int baseOffset, params int[] offsets)
 		{
-			return MakeString(DerefType, DefaultModuleBase + baseOffset, offsets);
+			return MakeString(_derefType, _defaultModuleBase + baseOffset, offsets);
 		}
 
 		public StringPointer MakeString(DerefType derefType, int baseOffset, params int[] offsets)
 		{
-			return MakeString(derefType, DefaultModuleBase + baseOffset, offsets);
+			return MakeString(derefType, _defaultModuleBase + baseOffset, offsets);
 		}
 		#endregion
 
 		#region ModuleName
 		public StringPointer MakeString(string moduleName, int baseOffset, params int[] offsets)
 		{
-			return MakeString(DerefType, Process.Module(moduleName).BaseAddress + baseOffset, offsets);
+			return MakeString(_derefType, _process.Module(moduleName).BaseAddress + baseOffset, offsets);
 		}
 
 		public StringPointer MakeString(DerefType derefType, string moduleName, int baseOffset, params int[] offsets)
 		{
-			return MakeString(derefType, Process.Module(moduleName).BaseAddress + baseOffset, offsets);
+			return MakeString(derefType, _process.Module(moduleName).BaseAddress + baseOffset, offsets);
 		}
 		#endregion
 
 		#region Module
 		public StringPointer MakeString(ProcessModule module, int baseOffset, params int[] offsets)
 		{
-			return MakeString(DerefType, module.BaseAddress + baseOffset, offsets);
+			return MakeString(_derefType, module.BaseAddress + baseOffset, offsets);
 		}
 
 		public StringPointer MakeString(DerefType derefType, ProcessModule module, int baseOffset, params int[] offsets)
@@ -116,12 +116,12 @@ public partial class Pointer
 		#region Address
 		public StringPointer MakeString(IntPtr address, params int[] offsets)
 		{
-			return MakeString(DerefType, address, offsets);
+			return MakeString(_derefType, address, offsets);
 		}
 
 		public StringPointer MakeString(DerefType derefType, IntPtr address, params int[] offsets)
 		{
-			var pointer = new StringPointer(Process, derefType, address, offsets);
+			var pointer = new StringPointer(_process, derefType, address, offsets);
 			_ = pointer.Current;
 
 			return pointer;
@@ -131,7 +131,7 @@ public partial class Pointer
 		#region Pointer
 		public StringPointer MakeString(Pointer parent, params int[] offsets)
 		{
-			return MakeString(DerefType, parent, offsets);
+			return MakeString(_derefType, parent, offsets);
 		}
 
 		public StringPointer MakeString(DerefType derefType, Pointer parent, params int[] offsets)

@@ -110,7 +110,7 @@ public static partial class ProcessExtensions
 		return process.Modules().FirstOrDefault(module => module.ModuleName.Equals(moduleName, StringComparison.OrdinalIgnoreCase));
 	}
 
-	private static Dictionary<int, ProcessModule[]> ModuleCache = new();
+	private static readonly Dictionary<int, ProcessModule[]> _moduleCache = new();
 
 	/// <summary>
 	///     Retrieves an array of <see cref="ProcessModule"/> objects currently loaded by the specified process.
@@ -127,19 +127,19 @@ public static partial class ProcessExtensions
 		var moduleCount = totalModules / (uint)(IntPtr.Size);
 		var hash = process.StartTime.GetHashCode() + process.Id + (int)(moduleCount);
 
-		if (ModuleCache.TryGetValue(hash, out var cachedModules))
+		if (_moduleCache.TryGetValue(hash, out var cachedModules))
 			return cachedModules;
 
-		lock (ModuleCache)
+		lock (_moduleCache)
 		{
-			if (ModuleCache.Count > 100)
-				ModuleCache.Clear();
+			if (_moduleCache.Count > 100)
+				_moduleCache.Clear();
 
 			var modules = new List<ProcessModule>();
 			var strBuilder = new StringBuilder(200);
 			var procHandle = process.Handle;
 
-			for (int i = 0; i < moduleCount; ++i)
+			for (var i = 0; i < moduleCount; ++i)
 			{
 				var moduleHandle = hModules[i];
 
@@ -170,7 +170,7 @@ public static partial class ProcessExtensions
 				});
 			}
 
-			ModuleCache[hash] = modules.ToArray();
+			_moduleCache[hash] = modules.ToArray();
 			return modules.ToArray();
 		}
 	}

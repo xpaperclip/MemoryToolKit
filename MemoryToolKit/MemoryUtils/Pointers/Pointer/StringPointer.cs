@@ -62,12 +62,12 @@ public class StringPointer : Pointer
 	{
 		base.Current = null;
 		base.Old = null;
-		LastUpdate = null;
+		_lastUpdate = null;
 	}
 
 	protected override bool Internal_Update()
 	{
-		if (Process.TryReadString(Length, StringType, out var result, Base, Offsets) || UpdateOnNullPointer)
+		if (_process.TryReadString(Length, StringType, out var result, Base, Offsets) || UpdateOnNullPointer)
 		{
 			_old = (string)(_current);
 			_current = result;
