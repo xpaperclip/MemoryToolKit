@@ -32,29 +32,9 @@ public partial class SignatureScanner
 	private readonly int _size;
 	private byte[] _memory;
 
-	public unsafe IntPtr Scan(Signature signature, int alignment = 1)
-	{
-		return ScanAll(new() { signature }, alignment).FirstOrDefault();
-	}
-
 	public IntPtr Scan(ScanTarget target, int alignment = 1)
 	{
 		return ScanAll(target, alignment).FirstOrDefault();
-	}
-
-	public IEnumerable<IntPtr> ScanAll(IEnumerable<Signature> signatures, int alignment = 1)
-	{
-		return ScanAll(new(signatures), alignment);
-	}
-
-	public IEnumerable<IntPtr> ScanAll(params Signature[] signatures)
-	{
-		return ScanAll(new(signatures), 1);
-	}
-
-	public IEnumerable<IntPtr> ScanAll(int alignment, params Signature[] signatures)
-	{
-		return ScanAll(new(signatures), alignment);
 	}
 
 	public IEnumerable<IntPtr> ScanAll(ScanTarget target, int alignment = 1)
@@ -70,7 +50,7 @@ public partial class SignatureScanner
 			foreach (int offset in new ScanEnumerator(_memory, alignment, signature))
 			{
 				var scan = _startAddress + offset + signature.Offset;
-				if (signature.EvaluateMatch?.Invoke(scan) ?? true)
+				if (signature.VerifyMatch?.Invoke(scan) ?? true)
 				{
 					target.OnFound?.Invoke(signature.Name, scan);
 					yield return scan;

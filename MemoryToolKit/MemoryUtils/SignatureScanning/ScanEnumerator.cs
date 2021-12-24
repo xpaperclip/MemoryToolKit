@@ -1,5 +1,4 @@
-﻿using MemoryToolKit.Helpers;
-using System.Collections;
+﻿using System.Collections;
 
 namespace MemoryToolKit.MemoryUtils.SigScan;
 
@@ -28,8 +27,8 @@ public partial class SignatureScanner
 
 		private unsafe bool NextPattern()
 		{
-			fixed (byte* memory = _memory, pattern = _signature.Pattern)
-			fixed (bool* mask = _signature.Mask)
+			fixed (byte* memory = _memory)
+			fixed (PatternByte* pattern = _signature.Bytes)
 			{
 				int alignment = _alignment;
 				int length = _length;
@@ -43,39 +42,18 @@ public partial class SignatureScanner
 
 				for (int i = 0; i < length; ++i)
 				{
-					if (!mask[i] && memory[next + i] != pattern[i])
+					var pByte = pattern[i];
+					var mByte = memory[next + i];
+
+					switch (pByte.Type)
 					{
-						next += alignment;
-						goto next;
-					}
-				}
-
-				Current = next;
-				_next = next + alignment;
-				return true;
-			}
-		}
-
-		private unsafe bool NextBytes()
-		{
-			fixed (byte* memory = _memory, pattern = _signature.Pattern)
-			{
-				int alignment = _alignment;
-				int length = _length;
-				int end = _end;
-				int next = _next;
-
-				next:
-
-				if (next >= end)
-					return false;
-
-				for (int i = 0; i < length; ++i)
-				{
-					if (memory[next + i] != pattern[i])
-					{
-						next += alignment;
-						goto next;
+						case ByteType.Any:
+							break;
+						case ByteType.Lower when pByte.Value != (mByte & 0xF):
+						case ByteType.Upper when pByte.Value != (mByte >> 4):
+						case ByteType.Full when pByte.Value != mByte:
+							next += alignment;
+							goto next;
 					}
 				}
 
@@ -87,7 +65,7 @@ public partial class SignatureScanner
 
 		public bool MoveNext()
 		{
-			return _signature.Mask is null ? NextBytes() : NextPattern();
+			return NextPattern();
 		}
 
 		public void Reset()
@@ -103,12 +81,12 @@ public partial class SignatureScanner
 
 		public void Dispose() { }
 
-		public IEnumerator GetEnumerator()
+		IEnumerator<int> IEnumerable<int>.GetEnumerator()
 		{
 			return this;
 		}
 
-		IEnumerator<int> IEnumerable<int>.GetEnumerator()
+		public IEnumerator GetEnumerator()
 		{
 			return this;
 		}

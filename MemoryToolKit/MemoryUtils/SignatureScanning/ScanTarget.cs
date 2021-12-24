@@ -12,13 +12,13 @@ public partial class ScanTarget
 
 	public bool DoScan { get; set; } = true;
 
-	public delegate IntPtr OnFoundCallBack(string name, IntPtr address);
-	public OnFoundCallBack OnFound { get; set; }
+	public delegate IntPtr OnFoundCallback(string name, IntPtr address);
+	public OnFoundCallback OnFound { get; set; }
 
-	private readonly List<Signature> _sigList = new();
+	private readonly List<Signature> _signatures = new();
 
 	public void Add(Signature signature)
 	{
-		_sigList.Add(signature);
+		_signatures.Add(signature);
 	}
 }
