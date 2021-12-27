@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Numerics;
 
 namespace MemoryToolKit.MemoryUtils.SigScan;
 
@@ -15,7 +16,7 @@ public partial class SignatureScanner
 			_alignment = alignment;
 			_signature = signature;
 			_length = signature.Length;
-			_end = memory.Length - signature.Length;
+			_end = memory.Length - signature.len;
 		}
 
 		private readonly byte[] _memory;
@@ -27,6 +28,28 @@ public partial class SignatureScanner
 
 		private unsafe bool NextPattern()
 		{
+#if true
+			int next = _next;
+			int _end = this._end;
+			int _alignment = this._alignment;
+			int len = _signature.len;
+			var vs = _signature.vs;
+			var vm = _signature.vm;
+
+			var mem = new ReadOnlySpan<byte>(_memory);
+
+			for (; next < _end; next += _alignment)
+			{
+				var vb = new Vector<byte>(mem.Slice(next, len));
+				if (((vb ^ vs) & vm) == Vector<byte>.Zero)
+				{
+					Current = next;
+					_next = next + _alignment;
+					return true;
+				}
+			}
+			return false;
+#else
 			fixed (byte* memory = _memory)
 			fixed (PatternByte* pattern = _signature.Bytes)
 			{
@@ -35,7 +58,7 @@ public partial class SignatureScanner
 				int end = _end;
 				int next = _next;
 
-				next:
+			next:
 
 				if (next >= end)
 					return false;
@@ -61,6 +84,7 @@ public partial class SignatureScanner
 				_next = next + alignment;
 				return true;
 			}
+#endif
 		}
 
 		public bool MoveNext()

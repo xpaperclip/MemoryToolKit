@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Numerics;
 using System.Text.RegularExpressions;
 
 namespace MemoryToolKit.MemoryUtils.SigScan;
@@ -39,6 +40,7 @@ public struct Signature
 				};
 			}
 		}
+		(len, vs, vm) = FillVectors(Bytes);
 	}
 
 	public Signature(params string[] pattern)
@@ -51,6 +53,7 @@ public struct Signature
 		Offset = offset;
 
 		Bytes = pattern.Select(b => new PatternByte { Value = b, Type = ByteType.Full }).ToArray();
+		(len, vs, vm) = FillVectors(Bytes);
 	}
 
 	public Signature(params byte[] pattern)
@@ -65,5 +68,49 @@ public struct Signature
 	public int Length
 	{
 		get => Bytes?.Length ?? 0;
+	}
+
+
+
+	public int len;
+	public Vector<byte> vs;
+	public Vector<byte> vm;
+
+	private static (int, Vector<byte>, Vector<byte>) FillVectors(PatternByte[] Bytes)
+	{
+		int len = Bytes.Length;
+		if (len < Vector<byte>.Count) len = Vector<byte>.Count;
+
+		byte[] search = new byte[len];
+		byte[] mask = new byte[len];
+		for (int i = 0; i < Bytes.Length; i++)
+		{
+			var b = Bytes[i];
+			switch (b.Type)
+			{
+				case ByteType.Any:
+					search[i] = 0x00;
+					mask[i] = 0x00;
+					break;
+				case ByteType.Lower:
+					search[i] = b.Value;
+					mask[i] = 0x0F;
+					break;
+				case ByteType.Upper:
+					search[i] = (byte)(b.Value << 4);
+					mask[i] = 0xF0;
+					break;
+				case ByteType.Full:
+					search[i] = b.Value;
+					mask[i] = 0xFF;
+					break;
+			}
+
+		}
+
+		var vs = new Vector<byte>(search);
+		var vm = new Vector<byte>(mask);
+
+		return (len, vs, vm);
 	}
 }
